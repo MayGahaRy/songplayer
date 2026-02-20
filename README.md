@@ -42,6 +42,19 @@ git push -u origin main
 
 A GitHub Actions workflow is included at `.github/workflows/windows-build.yml`.
 
+## GitHub Release Automation
+
+Release assets are auto-generated from tags via `.github/workflows/release.yml`.
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+```
+
+This creates a GitHub Release and uploads:
+- `release/PulseDeck Setup <version>.exe`
+- `release/PulseDeck Setup <version>.exe.blockmap`
+
 ## Project Structure
 
 - `main.js`: Electron main process + dialogs + metadata + state persistence
