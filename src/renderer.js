@@ -1,5 +1,8 @@
 const DEFAULT_VOLUME = 0.85;
 const REPEAT_MODES = ["off", "all", "one"];
+const FILTER_MODES = ["all", "favorites"];
+const EMPTY_PLAYLIST_MESSAGE = "No songs yet. Click \"Add Songs\" or import an entire folder.";
+const EMPTY_FILTER_MESSAGE = "No songs match the current search or favorite filter.";
 
 const state = {
   playlist: [],
@@ -11,6 +14,9 @@ const state = {
   currentTrackDetails: null,
   detailsToken: 0,
   saveTimer: null,
+  likedTrackIds: new Set(),
+  searchQuery: "",
+  filterMode: "all",
 };
 
 const audio = document.getElementById("audio-player");
@@ -21,8 +27,12 @@ const prevButton = document.getElementById("prev-btn");
 const nextButton = document.getElementById("next-btn");
 const shuffleButton = document.getElementById("shuffle-btn");
 const repeatButton = document.getElementById("repeat-btn");
+const likeCurrentButton = document.getElementById("like-current-btn");
 const removeButton = document.getElementById("remove-btn");
 const clearButton = document.getElementById("clear-btn");
+const favoritesFilterButton = document.getElementById("favorites-filter-btn");
+const searchInput = document.getElementById("search-input");
+const favoritesSummary = document.getElementById("favorites-summary");
 const seekSlider = document.getElementById("seek-slider");
 const volumeSlider = document.getElementById("volume-slider");
 const currentTimeLabel = document.getElementById("current-time");
@@ -43,6 +53,10 @@ function titleFromPath(filePath) {
   const filename = chunks[chunks.length - 1] || "Unknown Song";
   const withoutExt = filename.replace(/\.[^/.]+$/, "");
   return withoutExt.replace(/[_-]+/g, " ").trim() || filename;
+}
+
+function isValidIndex(index, length = state.playlist.length) {
+  return Number.isInteger(index) && index >= 0 && index < length;
 }
 
 function formatTime(seconds) {
@@ -79,7 +93,21 @@ function sanitizeTrack(track) {
   };
 }
 
+function isTrackLiked(trackId) {
+  return typeof trackId === "string" && state.likedTrackIds.has(trackId);
+}
+
+function cleanFavoriteIds() {
+  const playlistIds = new Set(state.playlist.map((track) => track.id));
+  for (const likedId of state.likedTrackIds) {
+    if (!playlistIds.has(likedId)) {
+      state.likedTrackIds.delete(likedId);
+    }
+  }
+}
+
 function serializeState() {
+  cleanFavoriteIds();
   return {
     playlist: state.playlist,
     currentIndex: state.currentIndex,
@@ -87,6 +115,7 @@ function serializeState() {
     repeatMode: state.repeatMode,
     shuffleEnabled: state.shuffleEnabled,
     volume: clampNumber(Number(volumeSlider.value), 0, 1),
+    likedTrackIds: [...state.likedTrackIds],
   };
 }
 
@@ -161,7 +190,35 @@ function updateNowPlayingMeta() {
 
   const artist = state.currentTrackDetails.artist || "Unknown artist";
   const album = state.currentTrackDetails.album;
-  trackSubtitle.textContent = album ? `${artist} • ${album}` : artist;
+  trackSubtitle.textContent = album ? `${artist} - ${album}` : artist;
+}
+
+function updateCurrentLikeButton() {
+  if (!isValidIndex(state.currentIndex)) {
+    likeCurrentButton.disabled = true;
+    likeCurrentButton.textContent = "Like";
+    likeCurrentButton.classList.remove("active");
+    return;
+  }
+
+  const currentTrack = state.playlist[state.currentIndex];
+  const liked = isTrackLiked(currentTrack.id);
+
+  likeCurrentButton.disabled = false;
+  likeCurrentButton.textContent = liked ? "Liked" : "Like";
+  likeCurrentButton.classList.toggle("active", liked);
+}
+
+function updateFavoritesSummary() {
+  cleanFavoriteIds();
+  const favoriteCount = state.likedTrackIds.size;
+  favoritesSummary.textContent = `${favoriteCount} favorite${favoriteCount === 1 ? "" : "s"}`;
+}
+
+function updateFavoriteFilterButton() {
+  const favoritesOnly = state.filterMode === "favorites";
+  favoritesFilterButton.classList.toggle("active", favoritesOnly);
+  favoritesFilterButton.textContent = favoritesOnly ? "Favorites Only" : "All Songs";
 }
 
 function updateControlState() {
@@ -171,8 +228,10 @@ function updateControlState() {
   nextButton.disabled = !hasTracks;
   shuffleButton.disabled = !hasTracks;
   repeatButton.disabled = !hasTracks;
-  removeButton.disabled = state.selectedIndex < 0;
+  removeButton.disabled = !isValidIndex(state.selectedIndex);
   clearButton.disabled = !hasTracks;
+  searchInput.disabled = !hasTracks;
+  favoritesFilterButton.disabled = !hasTracks;
 }
 
 function updateModeButtons() {
@@ -192,26 +251,66 @@ function updateModeButtons() {
   repeatButton.classList.toggle("active", state.repeatMode !== "off");
 }
 
+function getVisibleTrackIndexes() {
+  const query = state.searchQuery.trim().toLowerCase();
+  const onlyFavorites = state.filterMode === "favorites";
+  const visibleIndexes = [];
+
+  for (let index = 0; index < state.playlist.length; index += 1) {
+    const track = state.playlist[index];
+    const liked = isTrackLiked(track.id);
+    if (onlyFavorites && !liked) {
+      continue;
+    }
+
+    if (query) {
+      const haystack = `${track.title} ${track.path}`.toLowerCase();
+      if (!haystack.includes(query)) {
+        continue;
+      }
+    }
+
+    visibleIndexes.push(index);
+  }
+
+  return visibleIndexes;
+}
+
 function renderPlaylist() {
   while (playlistElement.firstChild) {
     playlistElement.removeChild(playlistElement.firstChild);
   }
 
-  for (let index = 0; index < state.playlist.length; index += 1) {
+  const visibleIndexes = getVisibleTrackIndexes();
+
+  for (const index of visibleIndexes) {
     const track = state.playlist[index];
     const item = document.createElement("li");
     item.className = "song-item";
     item.dataset.index = String(index);
 
+    const topRow = document.createElement("div");
+    topRow.className = "song-head";
+
     const title = document.createElement("div");
     title.className = "song-title";
     title.textContent = track.title;
+
+    const likeButton = document.createElement("button");
+    likeButton.type = "button";
+    likeButton.className = "song-like-btn";
+    likeButton.dataset.index = String(index);
+
+    const liked = isTrackLiked(track.id);
+    likeButton.textContent = liked ? "Liked" : "Like";
+    likeButton.classList.toggle("active", liked);
 
     const filePath = document.createElement("div");
     filePath.className = "song-path";
     filePath.textContent = track.path;
 
-    item.append(title, filePath);
+    topRow.append(title, likeButton);
+    item.append(topRow, filePath);
 
     if (index === state.currentIndex) {
       item.classList.add("active");
@@ -223,8 +322,36 @@ function renderPlaylist() {
     playlistElement.appendChild(item);
   }
 
-  emptyState.style.display = state.playlist.length === 0 ? "block" : "none";
+  if (state.playlist.length === 0) {
+    emptyState.textContent = EMPTY_PLAYLIST_MESSAGE;
+    emptyState.style.display = "block";
+  } else if (visibleIndexes.length === 0) {
+    emptyState.textContent = EMPTY_FILTER_MESSAGE;
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
+  }
+
+  updateFavoritesSummary();
+  updateFavoriteFilterButton();
+  updateCurrentLikeButton();
   updateControlState();
+}
+
+function toggleTrackLikeByIndex(index) {
+  if (!isValidIndex(index)) {
+    return;
+  }
+
+  const track = state.playlist[index];
+  if (isTrackLiked(track.id)) {
+    state.likedTrackIds.delete(track.id);
+  } else {
+    state.likedTrackIds.add(track.id);
+  }
+
+  renderPlaylist();
+  queueStateSave();
 }
 
 async function hydrateCurrentTrackDetails(expectedIndex) {
@@ -283,7 +410,7 @@ async function hydrateCurrentTrackDetails(expectedIndex) {
 }
 
 function applyTrack(index, shouldPlay = false, persistState = true) {
-  if (index < 0 || index >= state.playlist.length) {
+  if (!isValidIndex(index)) {
     return;
   }
 
@@ -316,7 +443,7 @@ function playCurrent() {
     return;
   }
 
-  if (state.currentIndex < 0) {
+  if (!isValidIndex(state.currentIndex)) {
     applyTrack(0, true);
     return;
   }
@@ -443,12 +570,13 @@ function addTracks(tracks) {
 
   state.playlist.push(...deduped);
 
-  if (state.currentIndex === -1) {
+  if (!isValidIndex(state.currentIndex)) {
     applyTrack(0, false);
-  } else {
-    renderPlaylist();
-    queueStateSave();
+    return;
   }
+
+  renderPlaylist();
+  queueStateSave();
 }
 
 function resetPlaybackUi() {
@@ -462,13 +590,15 @@ function resetPlaybackUi() {
 }
 
 function removeSelectedTrack() {
-  if (state.selectedIndex < 0 || state.selectedIndex >= state.playlist.length) {
+  if (!isValidIndex(state.selectedIndex)) {
     return;
   }
 
   const removedIndex = state.selectedIndex;
+  const removedTrack = state.playlist[removedIndex];
   state.playlist.splice(removedIndex, 1);
   state.selectedIndex = -1;
+  state.likedTrackIds.delete(removedTrack.id);
 
   if (state.playlist.length === 0) {
     state.currentIndex = -1;
@@ -495,6 +625,11 @@ function clearPlaylist() {
   state.playlist = [];
   state.currentIndex = -1;
   state.selectedIndex = -1;
+  state.likedTrackIds.clear();
+  state.searchQuery = "";
+  state.filterMode = "all";
+  searchInput.value = "";
+
   resetPlaybackUi();
   updateNowPlayingMeta();
   renderPlaylist();
@@ -543,6 +678,15 @@ async function restorePersistedState() {
   state.repeatMode = REPEAT_MODES.includes(savedState.repeatMode) ? savedState.repeatMode : "off";
   state.shuffleEnabled = Boolean(savedState.shuffleEnabled);
 
+  const restoredFilterMode = FILTER_MODES.includes(savedState.filterMode) ? savedState.filterMode : "all";
+  state.filterMode = restoredFilterMode;
+
+  const restoredLikedTrackIds = Array.isArray(savedState.likedTrackIds)
+    ? savedState.likedTrackIds.filter((id) => typeof id === "string" && id.trim())
+    : [];
+  state.likedTrackIds = new Set(restoredLikedTrackIds);
+  cleanFavoriteIds();
+
   const savedVolume = clampNumber(Number(savedState.volume), 0, 1);
   const startingVolume = Number.isFinite(savedVolume) ? savedVolume : DEFAULT_VOLUME;
   volumeSlider.value = String(startingVolume);
@@ -563,6 +707,10 @@ async function restorePersistedState() {
   state.selectedIndex = candidateSelectedIndex >= 0
     ? clampNumber(candidateSelectedIndex, 0, state.playlist.length - 1)
     : -1;
+
+  const savedSearchQuery = typeof savedState.searchQuery === "string" ? savedState.searchQuery : "";
+  state.searchQuery = savedSearchQuery;
+  searchInput.value = savedSearchQuery;
 
   updateModeButtons();
   applyTrack(state.currentIndex, false, false);
@@ -596,10 +744,39 @@ repeatButton.addEventListener("click", () => {
   queueStateSave();
 });
 
+likeCurrentButton.addEventListener("click", () => {
+  if (!isValidIndex(state.currentIndex)) {
+    return;
+  }
+
+  toggleTrackLikeByIndex(state.currentIndex);
+});
+
+favoritesFilterButton.addEventListener("click", () => {
+  state.filterMode = state.filterMode === "all" ? "favorites" : "all";
+  renderPlaylist();
+  queueStateSave();
+});
+
+searchInput.addEventListener("input", () => {
+  state.searchQuery = searchInput.value || "";
+  renderPlaylist();
+  queueStateSave();
+});
+
 removeButton.addEventListener("click", removeSelectedTrack);
 clearButton.addEventListener("click", clearPlaylist);
 
 playlistElement.addEventListener("click", (event) => {
+  const likeButton = event.target.closest(".song-like-btn");
+  if (likeButton) {
+    const likeIndex = Number(likeButton.dataset.index);
+    if (!Number.isNaN(likeIndex)) {
+      toggleTrackLikeByIndex(likeIndex);
+    }
+    return;
+  }
+
   const target = event.target.closest(".song-item");
   if (!target) {
     return;
@@ -616,6 +793,10 @@ playlistElement.addEventListener("click", (event) => {
 });
 
 playlistElement.addEventListener("dblclick", (event) => {
+  if (event.target.closest(".song-like-btn")) {
+    return;
+  }
+
   const target = event.target.closest(".song-item");
   if (!target) {
     return;
@@ -705,6 +886,11 @@ window.addEventListener("keydown", (event) => {
 
   if (event.code === "Delete") {
     removeSelectedTrack();
+    return;
+  }
+
+  if (event.code === "KeyF") {
+    toggleTrackLikeByIndex(state.currentIndex);
   }
 });
 

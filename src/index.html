@@ -37,7 +37,10 @@
 
           <div class="meta-column">
             <div class="track-meta">
-              <p class="eyebrow">Now Playing</p>
+              <div class="track-meta-top">
+                <p class="eyebrow">Now Playing</p>
+                <button id="like-current-btn" class="btn-ghost btn-like-now">Like</button>
+              </div>
               <h2 id="track-title">No song loaded</h2>
               <p id="track-subtitle">Import songs to start listening.</p>
               <p id="track-path">-</p>
@@ -74,11 +77,24 @@
 
       <section class="playlist-card reveal delay-2">
         <div class="playlist-header">
-          <h3>Playlist</h3>
+          <div class="playlist-title-group">
+            <h3>Playlist</h3>
+            <p id="favorites-summary" class="favorites-summary">0 favorites</p>
+          </div>
           <div class="playlist-actions">
             <button id="remove-btn" class="btn-ghost">Remove Selected</button>
             <button id="clear-btn" class="btn-danger">Clear Playlist</button>
           </div>
+        </div>
+
+        <div class="playlist-toolbar">
+          <input
+            id="search-input"
+            class="playlist-search"
+            type="search"
+            placeholder="Search in title or file path"
+          />
+          <button id="favorites-filter-btn" class="btn-toggle">All Songs</button>
         </div>
 
         <p id="empty-state" class="empty-state">

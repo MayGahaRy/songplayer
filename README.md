@@ -9,6 +9,7 @@ Desktop song player built with Electron. It supports:
 - Shuffle and repeat modes
 - Seek bar and volume control
 - Album cover display from file metadata
+- Like/unlike songs, favorites-only filter, and playlist search
 - Persistent player state (playlist, current track, settings)
 - Keyboard shortcuts (`Space`, `Left`, `Right`, `Delete`)
 
@@ -28,6 +29,7 @@ npm run dist
 
 - `npm run build` creates an unpacked app in `release/`
 - `npm run dist` creates an installer (NSIS on Windows)
+- Installer/exe icon is configured from `build/icon.ico`
 
 ## Git / GitHub Quick Start
 

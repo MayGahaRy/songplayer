@@ -22,9 +22,13 @@ const DEFAULT_PLAYER_STATE = {
   repeatMode: "off",
   shuffleEnabled: false,
   volume: 0.85,
+  likedTrackIds: [],
+  filterMode: "all",
+  searchQuery: "",
 };
 
 const REPEAT_MODES = new Set(["off", "all", "one"]);
+const FILTER_MODES = new Set(["all", "favorites"]);
 
 let mainWindow;
 let playerStatePath = "";
@@ -79,6 +83,7 @@ function clampNumber(value, minimum, maximum) {
 function sanitizePlayerState(input) {
   const raw = input && typeof input === "object" ? input : {};
   const playlist = Array.isArray(raw.playlist) ? raw.playlist.map(normalizeTrack).filter(Boolean) : [];
+  const playlistIds = new Set(playlist.map((track) => track.id));
 
   const currentIndexCandidate = Number.isInteger(raw.currentIndex) ? raw.currentIndex : -1;
   const selectedIndexCandidate = Number.isInteger(raw.selectedIndex) ? raw.selectedIndex : -1;
@@ -92,6 +97,11 @@ function sanitizePlayerState(input) {
   const repeatMode = REPEAT_MODES.has(raw.repeatMode) ? raw.repeatMode : "off";
   const shuffleEnabled = Boolean(raw.shuffleEnabled);
   const volume = clampNumber(Number(raw.volume), 0, 1);
+  const likedTrackIds = Array.isArray(raw.likedTrackIds)
+    ? [...new Set(raw.likedTrackIds.filter((id) => typeof id === "string" && id.trim()))].filter((id) => playlistIds.has(id))
+    : [];
+  const filterMode = FILTER_MODES.has(raw.filterMode) ? raw.filterMode : "all";
+  const searchQuery = typeof raw.searchQuery === "string" ? raw.searchQuery.slice(0, 160) : "";
 
   return {
     playlist,
@@ -100,6 +110,9 @@ function sanitizePlayerState(input) {
     repeatMode,
     shuffleEnabled,
     volume,
+    likedTrackIds,
+    filterMode,
+    searchQuery,
   };
 }
 
