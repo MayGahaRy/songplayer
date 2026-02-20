@@ -75,6 +75,15 @@
       <symbol id="icon-star" viewBox="0 0 24 24">
         <path d="M12 3l2.7 5.4 6 0.9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6-4.3-4.2 6-0.9z" />
       </symbol>
+      <symbol id="icon-image" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2" />
+        <circle cx="9" cy="10" r="1.8" />
+        <path d="M4 17l5.5-5 3.7 3.6 2.7-2.5 4.1 4.1" />
+      </symbol>
+      <symbol id="icon-undo" viewBox="0 0 24 24">
+        <path d="M8 7H3v5" />
+        <path d="M3 12a8 8 0 1 0 2.3-5.7L8 7" />
+      </symbol>
       <symbol id="icon-up" viewBox="0 0 24 24">
         <path d="M12 6l-5 6h10z" fill="currentColor" stroke="none" />
       </symbol>
@@ -84,12 +93,20 @@
       <symbol id="icon-drag" viewBox="0 0 24 24">
         <path d="M9 8h6M9 12h6M9 16h6" />
       </symbol>
+      <symbol id="icon-more" viewBox="0 0 24 24">
+        <circle cx="6" cy="12" r="1.6" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+        <circle cx="18" cy="12" r="1.6" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="2.6" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.05.05a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.05-.05a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.08a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.88.34l-.05.05a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.05-.05a1.7 1.7 0 0 0 .34-1.88 1.7 1.7 0 0 0-1.56-1H3a2 2 0 1 1 0-4h.08a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.88l-.05-.05a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.05.05a1.7 1.7 0 0 0 1.88.34h0a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.08a1.7 1.7 0 0 0 1 1.56 1.7 1.7 0 0 0 1.88-.34l.05-.05a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.05.05a1.7 1.7 0 0 0-.34 1.88v0a1.7 1.7 0 0 0 1.56 1H21a2 2 0 1 1 0 4h-.08a1.7 1.7 0 0 0-1.56 1z" />
+      </symbol>
     </svg>
 
     <main class="app-shell">
       <header class="topbar reveal">
         <div>
-          <p class="eyebrow">Electron Song Player</p>
           <h1>PulseDeck</h1>
         </div>
 
@@ -103,8 +120,10 @@
             />
             <button id="play-link-btn" class="btn-ghost">
               <svg class="btn-icon" aria-hidden="true"><use href="#icon-link"></use></svg>
+              <span class="btn-loader" aria-hidden="true"></span>
               <span class="btn-label">Play Link</span>
             </button>
+            <span id="link-loader-text" class="link-loader-text" aria-live="polite" hidden></span>
           </div>
 
           <div class="import-actions">
@@ -115,6 +134,9 @@
             <button id="add-folder-btn" class="btn-ghost">
               <svg class="btn-icon" aria-hidden="true"><use href="#icon-folder"></use></svg>
               <span class="btn-label">Add Folder</span>
+            </button>
+            <button id="open-settings-btn" class="btn-ghost icon-only" aria-label="Open app settings" title="Settings">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
             </button>
           </div>
         </div>
@@ -200,21 +222,17 @@
       <section class="playlist-card reveal delay-2">
         <div class="playlist-header">
           <div class="playlist-title-group">
-            <h3>Playlist</h3>
+            <h3>Playlists</h3>
             <p id="favorites-summary" class="favorites-summary">0 favorites</p>
           </div>
           <div class="playlist-actions">
-            <button id="move-up-btn" class="btn-ghost">
-              <svg class="btn-icon" aria-hidden="true"><use href="#icon-up"></use></svg>
-              <span class="btn-label">Move Up</span>
-            </button>
-            <button id="move-down-btn" class="btn-ghost">
-              <svg class="btn-icon" aria-hidden="true"><use href="#icon-down"></use></svg>
-              <span class="btn-label">Move Down</span>
-            </button>
-            <button id="remove-btn" class="btn-ghost">
+            <button
+              id="remove-btn"
+              class="btn-ghost icon-only"
+              aria-label="Toggle song delete mode"
+              title="Toggle song delete mode"
+            >
               <svg class="btn-icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
-              <span class="btn-label">Remove Selected</span>
             </button>
             <button id="clear-btn" class="btn-danger">
               <svg class="btn-icon" aria-hidden="true"><use href="#icon-clear"></use></svg>
@@ -223,25 +241,253 @@
           </div>
         </div>
 
-        <div class="playlist-toolbar">
-          <input
-            id="search-input"
-            class="playlist-search"
-            type="search"
-            placeholder="Search in title or file path"
-          />
-          <button id="favorites-filter-btn" class="btn-toggle">
-            <svg class="btn-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
-            <span class="btn-label">All Songs</span>
-          </button>
-        </div>
+        <div class="playlist-layout">
+          <aside class="playlist-sidebar">
+            <div id="playlist-tabs" class="playlist-tabs"></div>
+            <div id="playlist-cover-preview" class="playlist-cover-preview playlist-cover-preview-hidden" aria-hidden="true">
+              <img id="playlist-cover-image" alt="Active playlist cover" />
+              <span id="playlist-cover-fallback">PL</span>
+            </div>
+            <button
+              id="open-playlist-builder-btn"
+              class="btn-ghost icon-only playlist-add-btn"
+              aria-label="Create playlist"
+              title="Create playlist"
+            >
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-add"></use></svg>
+            </button>
+          </aside>
 
-        <p id="empty-state" class="empty-state">
-          No songs yet. Click "Add Songs" or import an entire folder.
-        </p>
-        <ul id="playlist" class="playlist"></ul>
+          <div class="playlist-main">
+            <div class="playlist-toolbar">
+              <input
+                id="search-input"
+                class="playlist-search"
+                type="search"
+                placeholder="Search in title or file path"
+              />
+              <button id="favorites-filter-btn" class="btn-toggle">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
+                <span class="btn-label">All Songs</span>
+              </button>
+            </div>
+
+            <p id="empty-state" class="empty-state">
+              No songs yet. Click "Add Songs" or import an entire folder.
+            </p>
+            <ul id="playlist" class="playlist"></ul>
+          </div>
+        </div>
       </section>
     </main>
+
+    <div id="playlist-builder-backdrop" class="playlist-builder-backdrop" hidden></div>
+    <div
+      id="playlist-builder-panel"
+      class="playlist-builder-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="playlist-builder-title"
+      hidden
+    >
+      <div class="builder-layout">
+        <aside class="builder-sidebar">
+          <div class="builder-sidebar-header">
+            <h4 id="playlist-builder-title">Playlists</h4>
+            <button id="builder-new-playlist-btn" class="btn-primary">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-add"></use></svg>
+              <span class="btn-label">New</span>
+            </button>
+          </div>
+          <ul id="builder-playlist-list" class="builder-playlist-list"></ul>
+        </aside>
+
+        <div class="builder-main">
+          <section class="builder-section">
+            <h4 class="builder-section-title">Create Playlist</h4>
+            <div class="builder-fields">
+              <input
+                id="builder-playlist-name-input"
+                class="playlist-name-input"
+                type="text"
+                placeholder="Playlist name"
+                maxlength="80"
+              />
+              <input
+                id="builder-song-search-input"
+                class="playlist-search"
+                type="search"
+                placeholder="Search songs to add"
+              />
+            </div>
+
+            <div class="builder-cover-row">
+              <div id="builder-cover-preview" class="playlist-cover-preview" title="Playlist cover preview">
+                <img id="builder-cover-image" alt="Builder playlist cover" />
+                <span id="builder-cover-fallback">PL</span>
+              </div>
+              <button id="builder-set-cover-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-image"></use></svg>
+                <span class="btn-label">Set Cover</span>
+              </button>
+              <button id="builder-clear-cover-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-undo"></use></svg>
+                <span class="btn-label">Clear Cover</span>
+              </button>
+            </div>
+
+            <div class="builder-actions-row">
+              <button id="builder-use-active-playlist-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
+                <span class="btn-label">Use Main List</span>
+              </button>
+              <button id="builder-add-system-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-folder"></use></svg>
+                <span class="btn-label">Add From System</span>
+              </button>
+            </div>
+
+            <p id="builder-empty-state" class="builder-empty-state">
+              No songs yet. Use "Use Main List" or "Add From System".
+            </p>
+            <ul id="builder-song-list" class="builder-song-list"></ul>
+
+            <div class="builder-footer">
+              <button id="builder-cancel-btn" class="btn-ghost">
+                <span class="btn-label">Cancel</span>
+              </button>
+              <button id="builder-create-btn" class="btn-primary">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-add"></use></svg>
+                <span class="btn-label">Create Playlist</span>
+              </button>
+            </div>
+          </section>
+
+          <section id="builder-settings-panel" class="builder-section builder-settings-panel" hidden>
+            <div class="builder-settings-header">
+              <h4 class="builder-section-title">Playlist Settings</h4>
+              <button id="builder-settings-open-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
+                <span class="btn-label">Open</span>
+              </button>
+            </div>
+
+            <input
+              id="builder-settings-name-input"
+              class="playlist-name-input"
+              type="text"
+              placeholder="Playlist name"
+              maxlength="80"
+            />
+
+            <div class="builder-cover-row">
+              <div
+                id="builder-settings-cover-preview"
+                class="playlist-cover-preview"
+                title="Selected playlist cover"
+              >
+                <img id="builder-settings-cover-image" alt="Selected playlist cover" />
+                <span id="builder-settings-cover-fallback">PL</span>
+              </div>
+              <button id="builder-settings-set-cover-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-image"></use></svg>
+                <span class="btn-label">Set Cover</span>
+              </button>
+              <button id="builder-settings-clear-cover-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-undo"></use></svg>
+                <span class="btn-label">Clear Cover</span>
+              </button>
+            </div>
+
+            <div class="builder-footer">
+              <button id="builder-settings-save-btn" class="btn-primary">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-add"></use></svg>
+                <span class="btn-label">Save Settings</span>
+              </button>
+              <button id="builder-settings-delete-btn" class="btn-danger">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+                <span class="btn-label">Delete Playlist</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="app-settings-backdrop" class="settings-backdrop" hidden></div>
+    <div
+      id="app-settings-panel"
+      class="settings-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="app-settings-title"
+      hidden
+    >
+      <div class="settings-header">
+        <h4 id="app-settings-title">Player Settings</h4>
+        <button id="close-settings-btn" class="btn-ghost icon-only" aria-label="Close settings">
+          <svg class="btn-icon" aria-hidden="true"><use href="#icon-clear"></use></svg>
+        </button>
+      </div>
+
+      <div class="settings-body">
+        <label class="settings-row settings-toggle-row" for="settings-autoplay-toggle">
+          <span>Auto Play On Startup</span>
+          <span class="settings-switch">
+            <input id="settings-autoplay-toggle" type="checkbox" />
+            <span class="settings-switch-track" aria-hidden="true">
+              <span class="settings-switch-thumb"></span>
+            </span>
+          </span>
+        </label>
+
+        <label class="settings-row settings-toggle-row" for="settings-startup-toggle">
+          <span>Launch When Windows Starts</span>
+          <span class="settings-switch">
+            <input id="settings-startup-toggle" type="checkbox" />
+            <span class="settings-switch-track" aria-hidden="true">
+              <span class="settings-switch-thumb"></span>
+            </span>
+          </span>
+        </label>
+
+        <div class="settings-row">
+          <span>Theme Accent Color</span>
+          <div class="settings-theme-controls">
+            <input id="settings-theme-color-input" type="color" value="#25d061" />
+            <input
+              id="settings-theme-color-text"
+              class="settings-color-text"
+              type="text"
+              maxlength="7"
+              placeholder="#25d061"
+            />
+            <button id="settings-theme-reset-btn" class="btn-ghost">
+              <span class="btn-label">Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <label for="settings-output-device-select">Output Device</label>
+          <div class="settings-output-controls">
+            <div class="settings-select-wrap">
+              <select id="settings-output-device-select" class="settings-select"></select>
+              <svg class="settings-select-icon" aria-hidden="true"><use href="#icon-down"></use></svg>
+            </div>
+            <button
+              id="settings-refresh-devices-btn"
+              class="btn-ghost icon-only"
+              aria-label="Refresh output devices"
+              title="Refresh devices"
+            >
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-undo"></use></svg>
+            </button>
+          </div>
+          <p id="settings-output-hint" class="settings-hint"></p>
+        </div>
+      </div>
+    </div>
 
     <audio id="audio-player" preload="metadata"></audio>
     <script src="./renderer.js"></script>
