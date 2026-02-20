@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulseDeck Song Player</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape shape-a"></div>
+    <div class="bg-shape shape-b"></div>
+
+    <main class="app-shell">
+      <header class="topbar reveal">
+        <div>
+          <p class="eyebrow">Electron Song Player</p>
+          <h1>PulseDeck</h1>
+        </div>
+        <div class="import-actions">
+          <button id="add-files-btn" class="btn-primary">Add Songs</button>
+          <button id="add-folder-btn" class="btn-ghost">Add Folder</button>
+        </div>
+      </header>
+
+      <section class="player-card reveal delay-1">
+        <div id="cover-glow" class="cover-glow"></div>
+        <div class="player-grid">
+          <div class="cover-column">
+            <div id="cover-wrap" class="cover-wrap">
+              <img id="cover-image" alt="Current song cover art" />
+              <div id="cover-fallback" class="cover-fallback">
+                <p>PulseDeck</p>
+                <span>No Cover</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="meta-column">
+            <div class="track-meta">
+              <p class="eyebrow">Now Playing</p>
+              <h2 id="track-title">No song loaded</h2>
+              <p id="track-subtitle">Import songs to start listening.</p>
+              <p id="track-path">-</p>
+            </div>
+
+            <div class="transport-row">
+              <button id="prev-btn" class="btn-ghost">Prev</button>
+              <button id="play-btn" class="btn-primary">Play</button>
+              <button id="next-btn" class="btn-ghost">Next</button>
+              <button id="shuffle-btn" class="btn-toggle">Shuffle Off</button>
+              <button id="repeat-btn" class="btn-toggle">Repeat Off</button>
+            </div>
+
+            <div class="seek-row">
+              <span id="current-time">0:00</span>
+              <input id="seek-slider" type="range" min="0" max="100" value="0" />
+              <span id="duration">0:00</span>
+            </div>
+
+            <div class="volume-row">
+              <label for="volume-slider">Volume</label>
+              <input
+                id="volume-slider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.85"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="playlist-card reveal delay-2">
+        <div class="playlist-header">
+          <h3>Playlist</h3>
+          <div class="playlist-actions">
+            <button id="remove-btn" class="btn-ghost">Remove Selected</button>
+            <button id="clear-btn" class="btn-danger">Clear Playlist</button>
+          </div>
+        </div>
+
+        <p id="empty-state" class="empty-state">
+          No songs yet. Click "Add Songs" or import an entire folder.
+        </p>
+        <ul id="playlist" class="playlist"></ul>
+      </section>
+    </main>
+
+    <audio id="audio-player" preload="metadata"></audio>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

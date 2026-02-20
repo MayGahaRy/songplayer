@@ -1,0 +1,55 @@
+{
+  "name": "songplayer",
+  "version": "1.0.0",
+  "description": "Desktop song player built with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "set ELECTRON_RUN_AS_NODE=&& electron .",
+    "dev": "set ELECTRON_RUN_AS_NODE=&& electron .",
+    "build": "electron-builder --dir",
+    "dist": "electron-builder",
+    "lint": "echo \"No lint configured\""
+  },
+  "keywords": [
+    "electron",
+    "music-player",
+    "desktop"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1"
+  },
+  "dependencies": {
+    "music-metadata": "^11.12.1"
+  },
+  "build": {
+    "appId": "com.pulsedeck.songplayer",
+    "productName": "PulseDeck",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
