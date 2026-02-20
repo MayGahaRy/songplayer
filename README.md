@@ -8,8 +8,11 @@ Desktop song player built with Electron. It supports:
 - Play/pause, previous/next
 - Shuffle and repeat modes
 - Seek bar and volume control
+- Windows-style volume icon button (mute/unmute + hover slider)
 - Album cover display from file metadata
 - Like/unlike songs, favorites-only filter, and playlist search
+- Reorder songs (drag-and-drop, move up/down)
+- Play songs directly from HTTP/HTTPS links without adding to playlist
 - Persistent player state (playlist, current track, settings)
 - Keyboard shortcuts (`Space`, `Left`, `Right`, `Delete`)
 

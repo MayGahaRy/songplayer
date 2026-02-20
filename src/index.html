@@ -10,15 +10,113 @@
     <div class="bg-shape shape-a"></div>
     <div class="bg-shape shape-b"></div>
 
+    <svg class="icon-sprite" aria-hidden="true" focusable="false">
+      <symbol id="icon-add" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="icon-folder" viewBox="0 0 24 24">
+        <path d="M3 7h6l2 2h10v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      </symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24">
+        <path d="M10 14l4-4" />
+        <path d="M7.5 16.5a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 1 1 5 5l-1 1" />
+        <path d="M16.5 7.5a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 1 1-5-5l1-1" />
+      </symbol>
+      <symbol id="icon-heart" viewBox="0 0 24 24">
+        <path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10z" />
+      </symbol>
+      <symbol id="icon-prev" viewBox="0 0 24 24">
+        <path d="M7 6v12" />
+        <path d="M18 6l-8 6 8 6z" />
+      </symbol>
+      <symbol id="icon-play" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="icon-pause" viewBox="0 0 24 24">
+        <path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="icon-next" viewBox="0 0 24 24">
+        <path d="M17 6v12" />
+        <path d="M6 6l8 6-8 6z" />
+      </symbol>
+      <symbol id="icon-shuffle" viewBox="0 0 24 24">
+        <path d="M4 7h3l10 10h3" />
+        <path d="M17 5h3v3" />
+        <path d="M4 17h3l3-3" />
+        <path d="M17 19h3v-3" />
+      </symbol>
+      <symbol id="icon-repeat" viewBox="0 0 24 24">
+        <path d="M4 9V6h14" />
+        <path d="M18 3l3 3-3 3" />
+        <path d="M20 15v3H6" />
+        <path d="M6 21l-3-3 3-3" />
+      </symbol>
+      <symbol id="icon-volume-high" viewBox="0 0 24 24">
+        <path d="M4 10h4l5-4v12l-5-4H4z" />
+        <path d="M16 9a4 4 0 0 1 0 6" />
+        <path d="M18.5 6.5a7.5 7.5 0 0 1 0 11" />
+      </symbol>
+      <symbol id="icon-volume-low" viewBox="0 0 24 24">
+        <path d="M4 10h4l5-4v12l-5-4H4z" />
+        <path d="M16 9a4 4 0 0 1 0 6" />
+      </symbol>
+      <symbol id="icon-volume-mute" viewBox="0 0 24 24">
+        <path d="M4 10h4l5-4v12l-5-4H4z" />
+        <path d="M17 9l4 4M21 9l-4 4" />
+      </symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16" />
+        <path d="M9 7V5h6v2" />
+        <path d="M7 7l1 12h8l1-12" />
+      </symbol>
+      <symbol id="icon-clear" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </symbol>
+      <symbol id="icon-star" viewBox="0 0 24 24">
+        <path d="M12 3l2.7 5.4 6 0.9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6-4.3-4.2 6-0.9z" />
+      </symbol>
+      <symbol id="icon-up" viewBox="0 0 24 24">
+        <path d="M12 6l-5 6h10z" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="icon-down" viewBox="0 0 24 24">
+        <path d="M12 18l5-6H7z" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="icon-drag" viewBox="0 0 24 24">
+        <path d="M9 8h6M9 12h6M9 16h6" />
+      </symbol>
+    </svg>
+
     <main class="app-shell">
       <header class="topbar reveal">
         <div>
           <p class="eyebrow">Electron Song Player</p>
           <h1>PulseDeck</h1>
         </div>
-        <div class="import-actions">
-          <button id="add-files-btn" class="btn-primary">Add Songs</button>
-          <button id="add-folder-btn" class="btn-ghost">Add Folder</button>
+
+        <div class="topbar-actions">
+          <div class="link-actions">
+            <input
+              id="song-link-input"
+              class="link-input"
+              type="url"
+              placeholder="https://example.com/song.mp3"
+            />
+            <button id="play-link-btn" class="btn-ghost">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-link"></use></svg>
+              <span class="btn-label">Play Link</span>
+            </button>
+          </div>
+
+          <div class="import-actions">
+            <button id="add-files-btn" class="btn-primary">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-add"></use></svg>
+              <span class="btn-label">Add Songs</span>
+            </button>
+            <button id="add-folder-btn" class="btn-ghost">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-folder"></use></svg>
+              <span class="btn-label">Add Folder</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -39,7 +137,10 @@
             <div class="track-meta">
               <div class="track-meta-top">
                 <p class="eyebrow">Now Playing</p>
-                <button id="like-current-btn" class="btn-ghost btn-like-now">Like</button>
+                <button id="like-current-btn" class="btn-ghost btn-like-now">
+                  <svg class="btn-icon" aria-hidden="true"><use href="#icon-heart"></use></svg>
+                  <span class="btn-label">Like</span>
+                </button>
               </div>
               <h2 id="track-title">No song loaded</h2>
               <p id="track-subtitle">Import songs to start listening.</p>
@@ -47,11 +148,26 @@
             </div>
 
             <div class="transport-row">
-              <button id="prev-btn" class="btn-ghost">Prev</button>
-              <button id="play-btn" class="btn-primary">Play</button>
-              <button id="next-btn" class="btn-ghost">Next</button>
-              <button id="shuffle-btn" class="btn-toggle">Shuffle Off</button>
-              <button id="repeat-btn" class="btn-toggle">Repeat Off</button>
+              <button id="prev-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-prev"></use></svg>
+                <span class="btn-label">Prev</span>
+              </button>
+              <button id="play-btn" class="btn-primary">
+                <svg class="btn-icon" aria-hidden="true"><use id="play-icon-use" href="#icon-play"></use></svg>
+                <span class="btn-label">Play</span>
+              </button>
+              <button id="next-btn" class="btn-ghost">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-next"></use></svg>
+                <span class="btn-label">Next</span>
+              </button>
+              <button id="shuffle-btn" class="btn-toggle">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-shuffle"></use></svg>
+                <span class="btn-label">Shuffle Off</span>
+              </button>
+              <button id="repeat-btn" class="btn-toggle">
+                <svg class="btn-icon" aria-hidden="true"><use href="#icon-repeat"></use></svg>
+                <span class="btn-label">Repeat Off</span>
+              </button>
             </div>
 
             <div class="seek-row">
@@ -61,15 +177,21 @@
             </div>
 
             <div class="volume-row">
-              <label for="volume-slider">Volume</label>
-              <input
-                id="volume-slider"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value="0.85"
-              />
+              <div id="volume-control" class="volume-control">
+                <button id="volume-btn" class="btn-ghost icon-only" aria-label="Mute or unmute">
+                  <svg class="btn-icon" aria-hidden="true"><use id="volume-icon-use" href="#icon-volume-high"></use></svg>
+                </button>
+                <div class="volume-popover">
+                  <input
+                    id="volume-slider"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="0.85"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -82,8 +204,22 @@
             <p id="favorites-summary" class="favorites-summary">0 favorites</p>
           </div>
           <div class="playlist-actions">
-            <button id="remove-btn" class="btn-ghost">Remove Selected</button>
-            <button id="clear-btn" class="btn-danger">Clear Playlist</button>
+            <button id="move-up-btn" class="btn-ghost">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-up"></use></svg>
+              <span class="btn-label">Move Up</span>
+            </button>
+            <button id="move-down-btn" class="btn-ghost">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-down"></use></svg>
+              <span class="btn-label">Move Down</span>
+            </button>
+            <button id="remove-btn" class="btn-ghost">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
+              <span class="btn-label">Remove Selected</span>
+            </button>
+            <button id="clear-btn" class="btn-danger">
+              <svg class="btn-icon" aria-hidden="true"><use href="#icon-clear"></use></svg>
+              <span class="btn-label">Clear Playlist</span>
+            </button>
           </div>
         </div>
 
@@ -94,7 +230,10 @@
             type="search"
             placeholder="Search in title or file path"
           />
-          <button id="favorites-filter-btn" class="btn-toggle">All Songs</button>
+          <button id="favorites-filter-btn" class="btn-toggle">
+            <svg class="btn-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
+            <span class="btn-label">All Songs</span>
+          </button>
         </div>
 
         <p id="empty-state" class="empty-state">
